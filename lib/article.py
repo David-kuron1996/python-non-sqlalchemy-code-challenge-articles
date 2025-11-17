@@ -6,15 +6,15 @@ class Article:
         self.magazine = magazine
         self.title = title
         Article.all.append(self)
-    
-    @property
-    def title(self):
-        return self._title
-    
-    @title.setter
-    def title(self, value):
-        if not isinstance(value, str):
-            raise TypeError("Title must be a string")
-        if not (5 <= len(value) <= 50):
-            raise ValueError("Title must be between 5 and 50 characters")
-        self._title = value
+        
+        # Add article to author's list
+        if self not in author._articles:
+            author._articles.append(self)
+        
+        # Add article to magazine's list
+        if self not in magazine._articles:
+            magazine._articles.append(self)
+        
+        # Add author to magazine's contributors if not already there
+        if author not in magazine._contributors:
+            magazine._contributors.append(author)
