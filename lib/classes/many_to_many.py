@@ -1,51 +1,79 @@
 class Article:
+    all = []
+    
     def __init__(self, author, magazine, title):
+        self._title = title  # Using underscore to make it "private"
         self.author = author
         self.magazine = magazine
-        self.title = title
+        Article.all.append(self)
+    
+    @property
+    def title(self):
+        return self._title
 
 class Author:
     def __init__(self, name):
-        self.name = name
-        self.authored_articles = []  # Track articles by this author
-
+        self._name = name  # Using underscore to make it "private"
+    
+    @property
+    def name(self):
+        return self._name
+    
     def articles(self):
-        return self.authored_articles
-
+        return [article for article in Article.all if article.author == self]
+    
     def magazines(self):
-        # Get unique magazines the author has written for
-        return list(set(article.magazine for article in self.authored_articles))
-
+        return list(set(article.magazine for article in self.articles()))
+    
     def add_article(self, magazine, title):
         article = Article(self, magazine, title)
-        self.authored_articles.append(article)
-        magazine.magazine_articles.append(article)  # Add to magazine's articles
-
+        return article
+    
     def topic_areas(self):
-        # Get unique categories of magazines the author has written for
-        return list(set(article.magazine.category for article in self.authored_articles))
+        return list(set(magazine.category for magazine in self.magazines()))
 
 class Magazine:
     def __init__(self, name, category):
-        self.name = name
-        self.category = category
-        self.magazine_articles = []  # Track articles in this magazine
-
+        if not isinstance(name, str) or len(name) < 2 or len(name) > 16:
+            raise ValueError("Magazine name must be a string between 2 and 16 characters")
+        if not isinstance(category, str) or len(category) == 0:
+            raise ValueError("Magazine category must be a non-empty string")
+            
+        self._name = name
+        self._category = category
+    
+    @property
+    def name(self):
+        return self._name
+    
+    @name.setter
+    def name(self, value):
+        if not isinstance(value, str) or len(value) < 2 or len(value) > 16:
+            raise ValueError("Magazine name must be a string between 2 and 16 characters")
+        self._name = value
+    
+    @property
+    def category(self):
+        return self._category
+    
+    @category.setter
+    def category(self, value):
+        if not isinstance(value, str) or len(value) == 0:
+            raise ValueError("Magazine category must be a non-empty string")
+        self._category = value
+    
     def articles(self):
-        return self.magazine_articles
-
+        return [article for article in Article.all if article.magazine == self]
+    
     def contributors(self):
-        # Get unique authors who have written for this magazine
-        return list(set(article.author for article in self.magazine_articles))
-
+        return list(set(article.author for article in self.articles()))
+    
     def article_titles(self):
-        # Get titles of all articles in this magazine
-        return [article.title for article in self.magazine_articles]
-
+        return [article.title for article in self.articles()]
+    
     def contributing_authors(self):
-        # Get authors with more than two articles in this magazine
         author_counts = {}
-        for article in self.magazine_articles:
+        for article in self.articles():
             author = article.author
             author_counts[author] = author_counts.get(author, 0) + 1
-        return [author for author, count in author_counts.items() if count > 1]
+        return [author for author, count in author_counts.items() if count > 2]
