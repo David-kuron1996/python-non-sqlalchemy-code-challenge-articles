@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import ipdb;
+import ipdb; ipdb.set_trace()  # noqa
 
 from classes.many_to_many import Article
 from classes.many_to_many import Author
